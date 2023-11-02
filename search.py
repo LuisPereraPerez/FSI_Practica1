@@ -98,13 +98,28 @@ def graph_search(problem, fringe):
     The argument fringe should be an empty queue.
     If two paths reach a state, only use the best one. [Fig. 3.18]"""
     closed = {}
+    nodes_g = []
+    nodes_v = []
     fringe.append(Node(problem.initial))
+
     while fringe:
         node = fringe.pop()
+        if node not in nodes_v:
+            nodes_v.append(node)
+
         if problem.goal_test(node.state):
+            print("\nTotal cost: ", node.path_cost)
+            print("Nº nodos generados: ", len(nodes_g))
+            print("Nº nodos visitados: ", len(nodes_v), "\n")
             return node
+
         if node.state not in closed:
             closed[node.state] = True
+            for i in range(len(node.expand(problem))):
+                next_node = node.expand(problem)[i]
+                if next_node != node and next_node not in nodes_g:
+                    nodes_g.append(next_node)
+            print("Nodo " + str(node) + " expande " + str(len(node.expand(problem)))+ " nodos: " + str(node.expand(problem)))
             fringe.extend(node.expand(problem))
     return None
 
@@ -191,6 +206,7 @@ def RandomGraph(nodes=list(range(10)), min_links=2, width=400, height=300,
     The distance between nodes is the hypotenuse times curvature(),
     where curvature() defaults to a random number between 1.1 and 1.5."""
     g = UndirectedGraph()
+    g.locations = {}
     g.locations = {}
     ## Build the cities
     for node in nodes:
