@@ -94,33 +94,47 @@ class Node:
 ## Uninformed Search algorithms
 
 def graph_search(problem, fringe):
-    """Search through the successors of a problem to find a goal.
-    The argument fringe should be an empty queue.
-    If two paths reach a state, only use the best one. [Fig. 3.18]"""
-    closed = {}
-    nodes_g = []
-    nodes_v = []
-    fringe.append(Node(problem.initial))
+    """
+    Busca a través de los sucesores de un problema para encontrar un objetivo.
+    El argumento fringe debería ser una cola vacía.
+    Si dos caminos alcanzan un estado, solo utiliza el mejor. [Fig. 3.18]
+    """
+    closed = {}  # Diccionario para realizar un seguimiento de los nodos cerrados (visitados)
+    nodes_g = []  # Lista para almacenar los nodos generados
+    nodes_v = []  # Lista para almacenar los nodos visitados
+    fringe.append(Node(problem.initial))  # Agrega el nodo inicial al conjunto de nodos abiertos (frontera)
 
     while fringe:
-        node = fringe.pop()
+        node = fringe.pop()  # Obtiene el nodo de la frontera para expandirlo
+
+        # Verifica si el nodo no ha sido visitado y lo agrega a los nodos visitados
         if node not in nodes_v:
             nodes_v.append(node)
 
+        # Verifica si se alcanzó el objetivo
         if problem.goal_test(node.state):
-            print("\nTotal cost: ", node.path_cost)
-            print("Nº nodos generados: ", len(nodes_g))
-            print("Nº nodos visitados: ", len(nodes_v), "\n")
+            print("\nCosto total: ", node.path_cost)
+            print("Nodos generados: ", len(nodes_g))
+            print("Nodos visitados: ", len(nodes_v), "\n")
             return node
 
+        # Verifica si el nodo no ha sido cerrado (visitado)
         if node.state not in closed:
             closed[node.state] = True
-            for i in range(len(node.expand(problem))):
-                next_node = node.expand(problem)[i]
-                if next_node != node and next_node not in nodes_g:
-                    nodes_g.append(next_node)
-            print("Nodo " + str(node) + " expande " + str(len(node.expand(problem)))+ " nodos: " + str(node.expand(problem)))
+
+            # Expande el nodo y agrega sus sucesores a la frontera
+            for child_node in node.expand(problem):
+                # Verifica que el sucesor no sea el nodo padre y no se encuentre en los nodos generados
+                if child_node != node and child_node not in nodes_g:
+                    nodes_g.append(child_node)  # Agrega el sucesor a los nodos generados
+
+            # Imprime la cantidad de nodos generados al expandir un nodo
+            print("Nodo " + str(node) + " expande " + str(len(node.expand(problem))) + " nodos: " + str(
+                node.expand(problem)))
+
+            # Extiende la frontera con los sucesores del nodo
             fringe.extend(node.expand(problem))
+
     return None
 
 
