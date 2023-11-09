@@ -94,47 +94,25 @@ class Node:
 ## Uninformed Search algorithms
 
 def graph_search(problem, fringe):
-    """
-    Busca a través de los sucesores de un problema para encontrar un objetivo.
-    El argumento fringe debería ser una cola vacía.
-    Si dos caminos alcanzan un estado, solo utiliza el mejor. [Fig. 3.18]
-    """
-    closed = {}  # Diccionario para realizar un seguimiento de los nodos cerrados (visitados)
-    nodes_g = []  # Lista para almacenar los nodos generados
-    nodes_v = []  # Lista para almacenar los nodos visitados
-    fringe.append(Node(problem.initial))  # Agrega el nodo inicial al conjunto de nodos abiertos (frontera)
-
+    """Search through the successors of a problem to find a goal.
+    The argument fringe should be an empty queue.
+    If two paths reach a state, only use the best one. [Fig. 3.18]"""
+    closed = {}
+    fringe.append(Node(problem.initial))
+    generados = 1
+    visitados = 0
     while fringe:
-        node = fringe.pop()  # Obtiene el nodo de la frontera para expandirlo
-
-        # Verifica si el nodo no ha sido visitado y lo agrega a los nodos visitados
-        if node not in nodes_v:
-            nodes_v.append(node)
-
-        # Verifica si se alcanzó el objetivo
+        visitados += 1
+        node = fringe.pop()
         if problem.goal_test(node.state):
-            print("\nCosto total: ", node.path_cost)
-            print("Nodos generados: ", len(nodes_g))
-            print("Nodos visitados: ", len(nodes_v), "\n")
+            print("Nodos generados: " + str(generados))
+            print("Nodos visitados: " + str(visitados))
+            print("Costo total: " + str(node.path_cost))
             return node
-
-        # Verifica si el nodo no ha sido cerrado (visitado)
         if node.state not in closed:
             closed[node.state] = True
-
-            # Expande el nodo y agrega sus sucesores a la frontera
-            for child_node in node.expand(problem):
-                # Verifica que el sucesor no sea el nodo padre y no se encuentre en los nodos generados
-                if child_node != node and child_node not in nodes_g:
-                    nodes_g.append(child_node)  # Agrega el sucesor a los nodos generados
-
-            # Imprime la cantidad de nodos generados al expandir un nodo
-            print("Nodo " + str(node) + " expande " + str(len(node.expand(problem))) + " nodos: " + str(
-                node.expand(problem)))
-
-            # Extiende la frontera con los sucesores del nodo
             fringe.extend(node.expand(problem))
-
+            generados += len(node.expand(problem))
     return None
 
 
@@ -147,6 +125,61 @@ def depth_first_graph_search(problem):
     """Search the deepest nodes in the search tree first. [p 74]"""
     return graph_search(problem, Stack())
 
+def branch_and_bound(problem):
+    # Inicializar la cola de prioridad con un nodo que contiene el estado inicial
+    fringe = priorityQueue()
+    fringe.append(Node(problem.initial))
+
+    generados = 1  # Iniciar en 1 porque hemos añadido el nodo inicial
+    visitados = 0
+
+    while fringe:
+        visitados += 1
+        # Se extrae el nodo con menor coste de la cola de prioridad
+        node = fringe.pop()
+
+        # Si el nodo es un estado objetivo, se devuelve el nodo
+        if problem.goal_test(node.state):
+            print("Nodos generados:", generados)
+            print("Nodos visitados:", visitados)
+            print("Costo total:", node.path_cost)
+            return node
+
+        # Se expande el nodo y se agregan sus sucesores a la cola de prioridad
+        successors = node.expand(problem)
+        generados += len(successors)
+        fringe.extend(successors)
+
+    # Si no se encuentra ninguna solución, devuelve None
+    return None
+
+def branch_and_bound_h(problem):
+    # Inicializar la cola de prioridad con un nodo que contiene el estado inicial
+    fringe = priorityQueue2(problem)
+    fringe.append(Node(problem.initial))
+
+    generados = 1  # Iniciar en 1 porque hemos añadido el nodo inicial
+    visitados = 0
+
+    while fringe:
+        visitados += 1
+        # Se extrae el nodo con menor costo (incluyendo la heurística) de la cola de prioridad
+        node = fringe.pop()
+
+        # Si el nodo es un estado objetivo, se devuelve el nodo
+        if problem.goal_test(node.state):
+            print("Nodos generados:", generados)
+            print("Nodos visitados:", visitados)
+            print("Costo total:", node.path_cost)
+            return node
+
+        # Se expande el nodo y se agregan sus sucesores a la cola de prioridad
+        successors = node.expand(problem)
+        generados += len(successors)
+        fringe.extend(successors)
+
+    # Si no se encuentra ninguna solución, devuelve None
+    return None
 
 
 # _____________________________________________________________________________
@@ -220,7 +253,6 @@ def RandomGraph(nodes=list(range(10)), min_links=2, width=400, height=300,
     The distance between nodes is the hypotenuse times curvature(),
     where curvature() defaults to a random number between 1.1 and 1.5."""
     g = UndirectedGraph()
-    g.locations = {}
     g.locations = {}
     ## Build the cities
     for node in nodes:
