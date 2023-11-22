@@ -127,7 +127,8 @@ def depth_first_graph_search(problem):
 
 def branch_and_bound(problem):
     # Inicializar la cola de prioridad con un nodo que contiene el estado inicial
-    fringe = priorityQueue()
+    closed = {}
+    fringe = PriorityQueueWithSort()
     fringe.append(Node(problem.initial))
 
     generados = 1  # Iniciar en 1 porque hemos añadido el nodo inicial
@@ -145,17 +146,16 @@ def branch_and_bound(problem):
             print("Costo total:", node.path_cost)
             return node
 
-        # Se expande el nodo y se agregan sus sucesores a la cola de prioridad
-        successors = node.expand(problem)
-        generados += len(successors)
-        fringe.extend(successors)
-
-    # Si no se encuentra ninguna solución, devuelve None
+        if node.state not in closed: # Verificar si el estado actual ya ha sido visitado
+            closed[node.state] = True  # Marcar el estado como visitado
+            successors = node.expand(problem)
+            fringe.extend(successors)
+            generados += len(successors)
     return None
 
 def branch_and_bound_h(problem):
     # Inicializar la cola de prioridad con un nodo que contiene el estado inicial
-    fringe = priorityQueue2(problem)
+    fringe = BranchAndBoundUnderestimationPriorityQueue(problem)
     fringe.append(Node(problem.initial))
 
     generados = 1  # Iniciar en 1 porque hemos añadido el nodo inicial

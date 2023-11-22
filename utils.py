@@ -544,7 +544,7 @@ class FIFOQueue(Queue):
             self.start = 0
         return e
 
-class priorityQueue():
+class PriorityQueueWithSort():
 
     def __init__(self):
         self.A = []
@@ -568,7 +568,7 @@ class priorityQueue():
             self.start = 0
         return e
 
-class priorityQueue2():
+class BranchAndBoundUnderestimationPriorityQueue():
 
     def __init__(self, problem):
         self.A = []
